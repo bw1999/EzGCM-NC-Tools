@@ -57,8 +57,24 @@ classdef NC_File < handle
                 return
             end
 
+            % Make sure the extension is on it before searching
+            if ~contains(file_path, '.nc')
+                file_path = [file_path, '.nc'];
+            end
+
+            % If not on path, see if it's fully qualified and exists
+            file_to_read = which(file_path);
+            if isempty(file_to_read) 
+                if ~(exist(file_path) == 2)
+                    error(['File not on path and could not be found. If not on ' ...
+                           'path, qualify with the full path of the file'])
+                else
+                    file_to_read = file_path;
+                end
+            end
+
             % Get basic information about the file
-            [obj.dirname, obj.filename] = fileparts(file_path);
+            [obj.dirname, obj.filename] = fileparts(file_to_read);
             obj.filename = [obj.filename, '.nc'];
             
             filename_split = split(obj.filename, '.');
@@ -73,14 +89,11 @@ classdef NC_File < handle
             end
 
             % Store the file pointer
-            obj.fileId = netcdf.open(file_path);
+            obj.fileId = netcdf.open(file_to_read);
 
             % Pull location information
-            obj.lonVec = obj.get('longitude');
-            obj.latVec = obj.get('latitude');
-
-            obj.lonVec = obj.get('longitude');
-            obj.latVec = obj.get('latitude');
+            obj.lonVec = double(obj.get('longitude'));
+            obj.latVec = double(obj.get('latitude'));
 
             [obj.latGrid, obj.lonGrid] = meshgrid(obj.latVec, obj.lonVec);
         end

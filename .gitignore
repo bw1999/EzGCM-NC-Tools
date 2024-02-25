@@ -5,3 +5,6 @@ CDT/
 
 # Ignore anything in 'data' subfolder
 data/
+
+# Get rid of matlab .asv files. They have NO PLACE in this repository
+*.asv
